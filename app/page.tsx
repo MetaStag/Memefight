@@ -7,7 +7,7 @@ export default function Home() {
       <span className="text-2xl mb-16">A Meme <span className="text-green-400">Competition</span> Platform</span>
       <span className="text-lg">A Platform to let your imagination run free and create memes on the go!</span>
       <span className="text-lg mb-4">Join or Create your lobby, make memes and vote for them!</span>
-      <Button className="mb-16">Get Started</Button>
+      <Button className="mb-16 w-32 h-11 text-md">Get Started</Button>
     </div>
   )
 }

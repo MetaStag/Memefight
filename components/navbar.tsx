@@ -12,7 +12,7 @@ export default function Navbar() {
       </Link>
       <Link href="/">Home</Link>
       <Link href="/about">About</Link>
-      <Link href="/play">Play</Link>
+      <Link href="/lobby">Lobby</Link>
       <Login />
     </div>
   );
