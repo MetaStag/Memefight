@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/utils/supabase/server";
 
-export async function login(email: string, password: string): Promise<string> {
+export async function login(email: string, password: string): Promise<number> {
   const supabase = await createClient();
 
   const data = {
@@ -11,16 +11,16 @@ export async function login(email: string, password: string): Promise<string> {
   };
 
   const { error } = await supabase.auth.signInWithPassword(data);
+  console.log(error);
 
   if (error) {
-    console.log(error); // temp
-    return error.code || "Unknown error";
+    return error.status || 400;
   } else {
-    return "Logged in Succesfully";
+    return 200;
   }
 }
 
-export async function signup(email: string, password: string): Promise<string> {
+export async function signup(email: string, password: string): Promise<number> {
   const supabase = await createClient();
 
   const data = {
@@ -31,9 +31,8 @@ export async function signup(email: string, password: string): Promise<string> {
   const { error } = await supabase.auth.signUp(data);
 
   if (error) {
-    console.log(error); // temp
-    return error.code || "Unknown error";
+    return error.status || 400;
   } else {
-    return "Sign up successful";
+    return 200;
   }
 }

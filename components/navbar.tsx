@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Login from "./login";
-import { useEffect, useState } from "react";
 
 export default function Navbar() {
   return (

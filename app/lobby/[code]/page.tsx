@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { CreateClient } from "@/lib/utils/supabase/client";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import SvgComponent from "./copy";
+import SvgComponent from "./copyIcon";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Page({
@@ -24,7 +24,7 @@ export default function Page({
     const validate = async () => {
       const temp = (await params).code;
       const { data, error } = await supabase
-        .from("codes")
+        .from("lobbies")
         .select("members")
         .eq("code", temp);
       if (error || !data) {
@@ -38,7 +38,7 @@ export default function Page({
 
   const refresh = async () => {
     const { data, error } = await supabase
-      .from("codes")
+      .from("lobbies")
       .select("members")
       .eq("code", code);
     if (error || !data) {
