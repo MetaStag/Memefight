@@ -1,131 +1,93 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { useState, useEffect } from "react";
 import { CreateClient } from "@/lib/utils/supabase/client";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import SvgComponent from "./copyIcon";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Lobby() {
-  const [name, setName] = useState("");
+export default function Page() {
+  interface Member {
+    name: string;
+  }
   const [code, setCode] = useState("");
+  const [members, setMembers] = useState<Member[]>([]);
   const { toast } = useToast();
   const supabase = CreateClient();
+  const Router = useRouter();
+  const params = useSearchParams();
 
   useEffect(() => {
-    const protect = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) {
-        redirect("/");
+    const validate = async () => {
+      const temp: string = params.get("code") || "";
+      const { data, error } = await supabase
+        .from("lobbies")
+        .select("members")
+        .eq("code", temp);
+      if (error || !data) {
+        Router.push("/");
       }
+      setCode(temp);
+      if (data) setMembers(data[0].members);
     };
-    protect();
+    validate();
   }, []);
 
-  const joinlobby = async () => {
-    if (!name.trim()) {
-      toast({
-        title: "Invalid name",
-        description: "Enter a valid name",
-      });
+  const refresh = async () => {
+    const { data, error } = await supabase
+      .from("lobbies")
+      .select("members")
+      .eq("code", code);
+    if (error || !data[0]) {
       return;
     }
-    if (!code.trim() || code.length !== 5) {
-      toast({
-        title: "Invalid code",
-        description: "Enter a 5-digit number",
-      });
-      return;
-    }
-    const { data, error } = await supabase.from("lobbies").select();
-    if (error || !data) {
-      toast({
-        title: "Unknown error",
-        description: "An unknown error occured. Try again later",
-      });
-      return;
-    }
-    let id: number = -1;
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].code === code) {
-        id = i;
-        break;
-      }
-    }
-    if (id !== -1) {
-      let newMembers = data[id].members;
-      if (newMembers.length === 5) {
-        toast({
-          title: "Lobby full",
-          description: "Sorry! The lobby already has 5 people",
-        });
-      } else {
-        newMembers.push({ name: name });
-        console.log(newMembers);
-        const { error } = await supabase
-          .from("lobbies")
-          .update({ members: newMembers })
-          .eq("code", code);
-        if (error) {
-          console.log(error);
-        } else {
-          redirect(`/lobby/${code}`);
-        }
-      }
-    } else {
-      toast({
-        title: "Invalid code",
-        description: "Could not find an existing lobby with this code",
-      });
-    }
+    setMembers(data[0].members);
   };
 
-  const newlobby = async () => {
-    if (!name.trim()) {
+  const copyCode = () => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: "Clipboard",
+      description: "Code copied",
+    });
+  };
+
+  const play = () => {
+    if (members.length < 1) {
       toast({
-        title: "Invalid name",
-        description: "Enter a proper name",
+        title: "Less players",
+        description: "Sorry! You need 2-5 players to play this game",
       });
       return;
     }
-    let temp = "";
-    for (let i = 0; i < 5; i++) {
-      temp += Math.floor(Math.random() * 10);
-    }
-    setCode(temp);
-    const { error } = await supabase
-      .from("lobbies")
-      .insert({ code: code, members: [] });
-    if (error) {
-      toast({
-        title: "Error",
-        description: "An error occured. Try again later!",
-      });
-    } else {
-      redirect(`/lobby/${temp}`);
-    }
+    // push play to db and trigger update for everyone in lobby
+    Router.push(`/play?code=${code}`);
   };
 
   return (
-    <div className="flex flex-col justify-center m-4 gap-y-4 max-w-sm ml-auto mr-auto">
-      <span className="text-center text-4xl font-bold">Lobby</span>
-      <span>Enter your display name:</span>
-      <input
-        className="border-2 p-2 rounded-lg"
-        type="text"
-        placeholder="Enter name"
-        onChange={(e) => setName(e.target.value)}
-      ></input>
-      <span>Join Lobby</span>
-      <input
-        className="border-2 p-2 rounded-lg"
-        type="text"
-        placeholder="Enter lobby code"
-        onChange={(e) => setCode(e.target.value)}
-      ></input>
-      <Button onClick={() => joinlobby()}>Join</Button>
-      <span className="text-center">---or---</span>
-      <Button onClick={() => newlobby()}>Create New Lobby</Button>
+    <div className="flex flex-col items-center m-4 gap-y-4">
+      <span className="text-4xl font-bold">Lobby Waitroom</span>
+      <div>
+        <span className="bg-slate-400 p-1 inline rounded-lg ">{code}</span>
+        <button onClick={() => copyCode()}>
+          <SvgComponent className="inline" />
+        </button>
+      </div>
+      <span>
+        Share this <span className="underline">invite code</span> and invite
+        upto 4 friends!
+      </span>
+      <div className="bg-blue-100 flex flex-col items-center p-2 rounded-md my-8">
+        <span>Members List</span>
+        {members ? (
+          members.map((member) => <span key={member.name}>{member.name}</span>)
+        ) : (
+          <span>Loading...</span>
+        )}
+      </div>
+      <Button onClick={refresh}>Refresh member list</Button>
+      <Button onClick={() => play()}>Play!</Button>
     </div>
   );
 }

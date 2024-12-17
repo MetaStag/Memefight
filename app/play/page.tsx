@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import OldComponent from "./OldComponent";
 import NewComponent from "./NewComponent";
 
@@ -8,7 +9,9 @@ export default function Play() {
   const [image1, setImage1] = useState("");
   const [image2, setImage2] = useState("");
   const [vote, setVote] = useState(false);
-  const [time, setTime] = useState(5);
+  const [time, setTime] = useState(30);
+  const params = useSearchParams();
+  const code = params.get("code");
 
   useEffect(() => {
     const num1 = (Math.ceil(Math.random() * 10) % 5) + 1;
@@ -53,10 +56,10 @@ export default function Play() {
       </div>
 
       {vote ? (
-        <NewComponent code={29798} />
+        <NewComponent code={code} />
       ) : (
         <div>
-          <OldComponent />
+          <OldComponent code={code} />
           <div className="flex flex-col items-center">
             <span className="text-2xl font-bold mt-16 mb-4">Time left</span>
             <span className="text-2xl">{time} seconds left</span>

@@ -1,13 +1,16 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { CreateClient } from "@/lib/utils/supabase/client";
 import { Button } from "@/components/ui/button";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function NewComponent(props: any) {
   const [caption1, setCaption1] = useState("");
   const [caption2, setCaption2] = useState("");
   const [vote, setVote] = useState(0);
   const supabase = CreateClient();
+  const Router = useRouter();
 
   useEffect(() => {
     const getCaptions = async () => {
@@ -15,7 +18,7 @@ export default function NewComponent(props: any) {
         .from("lobbies")
         .select("caption1, caption2")
         .eq("code", props.code);
-      if (error || !data) {
+      if (error || !data[0]) {
         console.log(error);
       } else {
         setCaption1(data[0].caption1);
@@ -29,6 +32,8 @@ export default function NewComponent(props: any) {
     if (vote === 0) {
       return;
     }
+    console.log(vote);
+    console.log(props.code);
     let { data }: any = await supabase
       .from("lobbies")
       .select(`vote${vote}`)
@@ -41,7 +46,7 @@ export default function NewComponent(props: any) {
       .update(data[0])
       .eq("code", props.code);
     if (error) console.log(error);
-    redirect("/results")
+    Router.push(`/results?code=${props.code}`);
   };
   return (
     <div className="flex flex-col m-4 items-center gap-y-8">
