@@ -60,7 +60,7 @@ export default function Page() {
         if (error) {
           console.log(error);
         } else {
-          Router.push(`/lobby?code=${code}`);
+          Router.push(`/lobby?code=${code}&name=${name}`);
         }
       }
     } else {
@@ -98,7 +98,7 @@ export default function Page() {
         description: "An error occured. Try again later!",
       });
     } else {
-      Router.push(`/lobby?code=${temp}`);
+      Router.push(`/lobby?code=${temp}&name=${name}`);
     }
   };
 

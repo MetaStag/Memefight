@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { CreateClient } from "@/lib/utils/supabase/client";
 
-export default function Results() {
+export default function Results(props: any) {
   interface Result {
     code: string;
     members: [{ name: string }, { name: string }, any, any, any];
@@ -16,8 +15,7 @@ export default function Results() {
   const [first, setFirst] = useState({ name: "", votes: 0 });
   const [second, setSecond] = useState({ name: "", votes: 0 });
   const supabase = CreateClient();
-  const params = useSearchParams();
-  const code = params.get("code");
+  const code = props.code;
 
   useEffect(() => {
     const getData = async () => {

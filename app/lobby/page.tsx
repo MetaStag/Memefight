@@ -17,6 +17,11 @@ export default function Page() {
   const supabase = CreateClient();
   const Router = useRouter();
   const params = useSearchParams();
+  const name = params.get("name");
+  const channel = supabase.channel("lobby");
+  channel
+    .on("broadcast", { event: "play" }, (payload) => handleBroadcast(payload.payload))
+    .subscribe();
 
   useEffect(() => {
     const validate = async () => {
@@ -26,10 +31,14 @@ export default function Page() {
         .select("members")
         .eq("code", temp);
       if (error || !data) {
+        console.log(error);
         Router.push("/");
+      } else if (data.length < 1) {
+        Router.push("/");
+      } else {
+        setCode(temp);
+        setMembers(data[0].members);
       }
-      setCode(temp);
-      if (data) setMembers(data[0].members);
     };
     validate();
   }, []);
@@ -53,6 +62,13 @@ export default function Page() {
     });
   };
 
+  const handleBroadcast = (payload: any) => {
+    console.log(payload)
+    if (payload.message === "1") {
+      Router.push(`/play?code=${code}&name=${name}`);
+    }
+  };
+
   const play = () => {
     if (members.length < 1) {
       toast({
@@ -61,8 +77,13 @@ export default function Page() {
       });
       return;
     }
-    // push play to db and trigger update for everyone in lobby
-    Router.push(`/play?code=${code}`);
+
+    channel.send({
+      type: "broadcast",
+      event: "play",
+      payload: { message: "1" },
+    });
+    Router.push(`/play?code=${code}&name=${name}`);
   };
 
   return (
