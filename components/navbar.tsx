@@ -12,7 +12,7 @@ export default function Navbar() {
       <Link href="/">Home</Link>
       <Link href="/about">About</Link>
       <Link href="/lobby/create">Lobby</Link>
-      <Login />
+      <Login action={false}/>
     </div>
   );
 }

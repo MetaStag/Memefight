@@ -20,7 +20,9 @@ export default function Page() {
   const name = params.get("name");
   const channel = supabase.channel("lobby");
   channel
-    .on("broadcast", { event: "play" }, (payload) => handleBroadcast(payload.payload))
+    .on("broadcast", { event: "play" }, (payload) =>
+      handleBroadcast(payload.payload)
+    )
     .subscribe();
 
   useEffect(() => {
@@ -59,21 +61,22 @@ export default function Page() {
     toast({
       title: "Clipboard",
       description: "Code copied",
+      className: "bg-green-300"
     });
   };
 
   const handleBroadcast = (payload: any) => {
-    console.log(payload)
     if (payload.message === "1") {
       Router.push(`/play?code=${code}&name=${name}`);
     }
   };
 
   const play = () => {
-    if (members.length < 1) {
+    if (members.length < 3) {
       toast({
         title: "Less players",
-        description: "Sorry! You need 2-5 players to play this game",
+        description: "Sorry! You need 3-5 players to play this game",
+        variant: "destructive",
       });
       return;
     }
@@ -95,10 +98,7 @@ export default function Page() {
           <SvgComponent className="inline" />
         </button>
       </div>
-      <span>
-        Share this <span className="underline">invite code</span> and invite
-        upto 4 friends!
-      </span>
+      <span>Click the invite code above to copy it and invite upto 4 friends!</span>
       <div className="bg-blue-100 flex flex-col items-center p-2 rounded-md my-8">
         <span>Members List</span>
         {members ? (

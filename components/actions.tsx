@@ -2,37 +2,32 @@
 
 import { createClient } from "@/lib/utils/supabase/server";
 
-export async function login(email: string, password: string): Promise<number> {
+export async function login(email: string, password: string): Promise<string> {
   const supabase = await createClient();
 
-  const data = {
+  const { error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
-  };
-
-  const { error } = await supabase.auth.signInWithPassword(data);
-  console.log(error);
+  });
 
   if (error) {
-    return error.status || 400;
+    return error.code || "unkwown_error";
   } else {
-    return 200;
+    return "success";
   }
 }
 
-export async function signup(email: string, password: string): Promise<number> {
+export async function signup(email: string, password: string): Promise<string> {
   const supabase = await createClient();
 
-  const data = {
+  const { error } = await supabase.auth.signUp({
     email: email,
     password: password,
-  };
-
-  const { error } = await supabase.auth.signUp(data);
+  });
 
   if (error) {
-    return error.status || 400;
+    return error.code || "unknown_error";
   } else {
-    return 200;
+    return "success";
   }
 }

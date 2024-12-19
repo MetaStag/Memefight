@@ -13,18 +13,25 @@ export default function Page() {
   const supabase = CreateClient();
   const Router = useRouter();
 
-  const joinlobby = async () => {
+  const validateName = (): boolean => {
     if (!name.trim()) {
       toast({
         title: "Invalid name",
         description: "Enter a valid name",
+        variant: "destructive",
       });
-      return;
+      return false;
     }
-    if (!code.trim() || code.length !== 5) {
+    return true;
+  };
+
+  const joinlobby = async () => {
+    if (!validateName()) return;
+    if (!code.trim() || code.match("^[0-9]+$")===null || code.length !== 5) {
       toast({
         title: "Invalid code",
         description: "Enter a 5-digit number",
+        variant: "destructive",
       });
       return;
     }
@@ -33,6 +40,7 @@ export default function Page() {
       toast({
         title: "Unknown error",
         description: "An unknown error occured. Try again later",
+        variant: "destructive",
       });
       return;
     }
@@ -49,10 +57,10 @@ export default function Page() {
         toast({
           title: "Lobby full",
           description: "Sorry! The lobby already has 5 people",
+          variant: "destructive",
         });
       } else {
         newMembers.push({ name: name });
-        console.log(newMembers);
         const { error } = await supabase
           .from("lobbies")
           .update({ members: newMembers })
@@ -67,18 +75,13 @@ export default function Page() {
       toast({
         title: "Invalid code",
         description: "Could not find an existing lobby with this code",
+        variant: "destructive",
       });
     }
   };
 
   const newlobby = async () => {
-    if (!name.trim()) {
-      toast({
-        title: "Invalid name",
-        description: "Enter a proper name",
-      });
-      return;
-    }
+    if (!validateName()) return;
     let temp = "";
     for (let i = 0; i < 5; i++) {
       temp += Math.floor(Math.random() * 10);
@@ -96,6 +99,7 @@ export default function Page() {
       toast({
         title: "Error",
         description: "An error occured. Try again later!",
+        variant: "destructive",
       });
     } else {
       Router.push(`/lobby?code=${temp}&name=${name}`);
@@ -116,7 +120,7 @@ export default function Page() {
       <input
         className="border-2 p-2 rounded-lg"
         type="text"
-        placeholder="Enter lobby code"
+        placeholder="Enter 5-digit number"
         onChange={(e) => setCode(e.target.value)}
       ></input>
       <Button onClick={() => joinlobby()}>Join</Button>

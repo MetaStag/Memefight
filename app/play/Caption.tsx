@@ -27,6 +27,7 @@ export default function Caption(props: any) {
       toast({
         title: "Submitted",
         description: "Your caption was submitted!",
+        className: "bg-green-300",
       });
     }
   };
@@ -47,7 +48,9 @@ export default function Caption(props: any) {
           <Button onClick={() => handleSubmit()}>Submit</Button>
         </div>
       ) : (
-        <span className="text-lg m-12">Waiting 30s for players to finish making memes...</span>
+        <span className="text-lg m-12">
+          Waiting 30s for players to finish making memes...
+        </span>
       )}
     </div>
   );
