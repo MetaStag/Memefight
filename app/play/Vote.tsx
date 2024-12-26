@@ -31,7 +31,7 @@ export default function Vote(props: any) {
       toast({
         title: "Vote",
         description: "Vote added successfully",
-        className: "bg-green-300"
+        className: "bg-green-300",
       });
     }
   };

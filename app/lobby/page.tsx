@@ -61,7 +61,7 @@ export default function Page() {
     toast({
       title: "Clipboard",
       description: "Code copied",
-      className: "bg-green-300"
+      className: "bg-green-300",
     });
   };
 
@@ -72,7 +72,7 @@ export default function Page() {
   };
 
   const play = () => {
-    if (members.length < 3) {
+    if (members.length < 2) {
       toast({
         title: "Less players",
         description: "Sorry! You need 3-5 players to play this game",
@@ -98,7 +98,9 @@ export default function Page() {
           <SvgComponent className="inline" />
         </button>
       </div>
-      <span>Click the invite code above to copy it and invite upto 4 friends!</span>
+      <span>
+        Click the invite code above to copy it and invite upto 4 friends!
+      </span>
       <div className="bg-blue-100 flex flex-col items-center p-2 rounded-md my-8">
         <span>Members List</span>
         {members ? (
