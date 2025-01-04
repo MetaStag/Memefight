@@ -41,13 +41,6 @@ export default function Results(props: any) {
         const vote2 = parsedData.vote2 || 0;
         setFirst({ name: name1, votes: vote1 });
         setSecond({ name: name2, votes: vote2 });
-        const { error } = await supabase
-          .from("lobbies")
-          .delete()
-          .eq("code", code);
-        if (error) {
-          console.log(error);
-        }
       }
     };
     getData();

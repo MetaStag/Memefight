@@ -47,6 +47,7 @@ export default function Login() {
         token: response.credential,
       });
       if (error || !data) {
+        console.log(error)
         toast({
           title: "Error",
           description: "There was a problem logging you in",

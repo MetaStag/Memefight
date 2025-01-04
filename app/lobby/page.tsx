@@ -8,22 +8,25 @@ import SvgComponent from "./copyIcon";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
-  interface Member {
-    name: string;
-  }
   const [code, setCode] = useState("");
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<string[]>([]);
+  const [leader, setLeader] = useState(false);
   const { toast } = useToast();
   const supabase = CreateClient();
   const Router = useRouter();
   const params = useSearchParams();
   const name = params.get("name");
   const channel = supabase.channel("lobby");
+  // when leader starts the game, trigger start for everyone
   channel
     .on("broadcast", { event: "play" }, (payload) =>
       handleBroadcast(payload.payload)
     )
     .subscribe();
+  // when new member joins, refresh member list
+  channel.on("broadcast", { event: "refresh" }, (payload) => {
+    if (payload.payload.message === "1") refresh();
+  });
 
   useEffect(() => {
     const validate = async () => {
@@ -36,9 +39,11 @@ export default function Page() {
         console.log(error);
         Router.push("/");
       } else if (data.length < 1) {
+        // change to less than 3
         Router.push("/");
       } else {
         setCode(temp);
+        if (data[0].members[0].name === name) setLeader(true);
         setMembers(data[0].members);
       }
     };
@@ -104,13 +109,13 @@ export default function Page() {
       <div className="bg-blue-100 flex flex-col items-center p-2 rounded-md my-8">
         <span>Members List</span>
         {members ? (
-          members.map((member) => <span key={member.name}>{member.name}</span>)
+          members.map((member) => <span key={member}>{member}</span>)
         ) : (
           <span>Loading...</span>
         )}
       </div>
       <Button onClick={refresh}>Refresh member list</Button>
-      <Button onClick={() => play()}>Play!</Button>
+      {leader ? <Button onClick={() => play()}>Play!</Button> : <span></span>}
     </div>
   );
 }

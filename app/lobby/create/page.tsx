@@ -11,6 +11,7 @@ export default function Page() {
   const [code, setCode] = useState("");
   const { toast } = useToast();
   const supabase = CreateClient();
+  const channel = supabase.channel("lobby");
   const Router = useRouter();
 
   const validateName = (): boolean => {
@@ -27,7 +28,7 @@ export default function Page() {
 
   const joinlobby = async () => {
     if (!validateName()) return;
-    if (!code.trim() || code.match("^[0-9]+$")===null || code.length !== 5) {
+    if (!code.trim() || code.match("^[0-9]+$") === null || code.length !== 5) {
       toast({
         title: "Invalid code",
         description: "Enter a 5-digit number",
@@ -60,7 +61,7 @@ export default function Page() {
           variant: "destructive",
         });
       } else {
-        newMembers.push({ name: name });
+        newMembers.push(name);
         const { error } = await supabase
           .from("lobbies")
           .update({ members: newMembers })
@@ -68,6 +69,11 @@ export default function Page() {
         if (error) {
           console.log(error);
         } else {
+          channel.send({
+            type: "broadcast",
+            event: "refresh",
+            payload: { message: "1" },
+          });
           Router.push(`/lobby?code=${code}&name=${name}`);
         }
       }
@@ -89,7 +95,7 @@ export default function Page() {
     setCode(temp);
     const { error } = await supabase.from("lobbies").insert({
       code: temp,
-      members: [{ name: name }],
+      members: [name],
       caption1: "",
       caption2: "",
       vote1: 0,
