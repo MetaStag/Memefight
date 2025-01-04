@@ -13,7 +13,7 @@ export default function Play() {
   const [player, setPlayer] = useState(2);
   const [captions, setCaptions] = useState<string[]>([]);
   const [phase, setPhase] = useState(0);
-  const [time, setTime] = useState(2);
+  const [time, setTime] = useState(60);
   const params = useSearchParams();
   const Router = useRouter();
   const code = params.get("code") || "";
@@ -55,7 +55,7 @@ export default function Play() {
       if (time < 1) {
         setPhase(phase + 1);
         if (phase === 1) () => clearInterval(interval);
-        else setTime(5);
+        else setTime(30);
       } else {
         setTime(time - 1);
       }

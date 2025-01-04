@@ -38,8 +38,7 @@ export default function Page() {
       if (error || !data) {
         console.log(error);
         Router.push("/");
-      } else if (data.length < 1) {
-        // change to less than 3
+      } else if (data.length < 3) {
         Router.push("/");
       } else {
         setCode(temp);
